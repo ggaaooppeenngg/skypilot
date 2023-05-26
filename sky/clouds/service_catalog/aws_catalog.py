@@ -110,7 +110,7 @@ def _fetch_and_apply_az_mapping(df: pd.DataFrame) -> pd.DataFrame:
         logger.debug(
             'Failed to get AWS user identity. Using the latest mapping '
             f'file for user {aws_user_hash!r}.')
-
+    print("aws_user_hash", aws_user_hash)
     az_mapping_path = common.get_catalog_path(
         f'aws/az_mappings-{aws_user_hash}.csv')
     if not os.path.exists(az_mapping_path):
@@ -139,12 +139,14 @@ def _fetch_and_apply_az_mapping(df: pd.DataFrame) -> pd.DataFrame:
 
 def _get_df() -> pd.DataFrame:
     if config.get_use_default_catalog():
+        print("default catalog" , _default_df)
         return _default_df
     else:
         global _user_df
         with _apply_az_mapping_lock:
             if _user_df is None:
                 _user_df = _fetch_and_apply_az_mapping(_default_df)
+        print("user df" , _user_df)
         return _user_df
 
 
@@ -195,6 +197,7 @@ def get_default_instance_type(cpus: Optional[str] = None,
         f'{family}.' for family in _DEFAULT_INSTANCE_FAMILY)
     df = _get_df()
     df = df[df['InstanceType'].str.startswith(instance_type_prefix)]
+    print("get default",df)
     return common.get_instance_type_for_cpus_mem_impl(df, cpus,
                                                       memory_gb_or_ratio)
 
@@ -218,6 +221,7 @@ def get_instance_type_for_accelerator(
     Returns a list of instance types satisfying the required count of
     accelerators with sorted prices and a list of candidates with fuzzy search.
     """
+    print("get instance acc")
     return common.get_instance_type_for_accelerator_impl(df=_get_df(),
                                                          acc_name=acc_name,
                                                          acc_count=acc_count,

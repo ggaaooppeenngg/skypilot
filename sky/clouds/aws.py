@@ -354,12 +354,13 @@ class AWS(clouds.Cloud):
 
     def get_feasible_launchable_resources(self,
                                           resources: 'resources_lib.Resources'):
+        print("resource",resources)
         if resources.instance_type is not None:
             assert resources.is_launchable(), resources
             # Treat Resources(AWS, p3.2x, V100) as Resources(AWS, p3.2x).
             resources = resources.copy(accelerators=None)
             return ([resources], [])
-
+        print("get feasible")
         def _make(instance_list):
             resource_list = []
             for instance_type in instance_list:
@@ -378,6 +379,7 @@ class AWS(clouds.Cloud):
         # Currently, handle a filter on accelerators only.
         accelerators = resources.accelerators
         if accelerators is None:
+            print("get default instance type")
             # Return a default instance type with the given number of vCPUs.
             default_instance_type = AWS.get_default_instance_type(
                 cpus=resources.cpus,

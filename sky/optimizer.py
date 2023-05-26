@@ -231,7 +231,7 @@ class Optimizer:
 
         # node -> cloud -> list of resources that satisfy user's requirements.
         node_to_candidate_map: _TaskToPerCloudCandidates = {}
-
+        print("topo_order", topo_order)
         # Compute the estimated cost/time for each node.
         for node_i, node in enumerate(topo_order):
             if node_i == 0:
@@ -896,6 +896,7 @@ def _make_launchables_for_valid_region_zones(
     # (e.g., in provisioner or optimizer), not here.
     launchables = []
     regions = launchable_resources.get_valid_regions_for_launchable()
+    print("make launchable regions", regions)
     for region in regions:
         if launchable_resources.use_spot and region.zones is not None:
             # Spot instances.
@@ -939,6 +940,7 @@ def _fill_in_launchable_resources(
                                resources_lib.Resources)
     if blocked_resources is None:
         blocked_resources = []
+    print("fill in")
     for resources in task.get_resources():
         if resources.cloud is not None and not _cloud_in_list(
                 resources.cloud, enabled_clouds):
@@ -974,6 +976,7 @@ def _fill_in_launchable_resources(
         else:
             clouds_list = ([resources.cloud]
                            if resources.cloud is not None else enabled_clouds)
+            print("clouds", clouds_list)
             # Hack: When >=2 cloud candidates, always remove local cloud from
             # possible candidates. This is so the optimizer will consider
             # public clouds, except local. Local will be included as part of
@@ -987,6 +990,7 @@ def _fill_in_launchable_resources(
             for cloud in clouds_list:
                 (feasible_resources, fuzzy_candidate_list) = (
                     cloud.get_feasible_launchable_resources(resources))
+                print("feas",feasible_resources,"fuzzy",fuzzy_candidate_list)
                 if len(feasible_resources) > 0:
                     # Assume feasible_resources is sorted by prices.
                     cheapest = feasible_resources[0]

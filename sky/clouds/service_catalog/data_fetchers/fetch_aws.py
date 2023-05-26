@@ -48,6 +48,8 @@ ALL_REGIONS = [
     'ap-southeast-1',
     'ap-southeast-2',
     'ap-northeast-1',
+    'cn-northwest-1',
+    'cn-north-1',
 ]
 US_REGIONS = ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2']
 
@@ -61,6 +63,7 @@ USEFUL_COLUMNS = [
 # only available in this region, but it serves pricing information for all
 # regions.
 PRICING_TABLE_URL_FMT = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/{region}/index.csv'  # pylint: disable=line-too-long
+PRICING_TABLE_URL_CN_FMT = 'https://pricing.cn-north-1.amazonaws.com.cn/offers/v1.0/cn/AmazonEC2/20230418173015/{region}/index.csv'
 # Hardcode the regions that offer p4de.24xlarge as our credential does not have
 # the permission to query the offerings of the instance.
 # Ref: https://aws.amazon.com/ec2/instance-types/p4/
@@ -73,8 +76,10 @@ def get_enabled_regions() -> Set[str]:
     # Should not be called concurrently.
     global regions_enabled
     if regions_enabled is None:
-        aws_client = aws.client('ec2', region_name='us-east-1')
+        aws_client = aws.client('ec2')
         try:
+            res = aws_client.describe_regions()
+            print(res)
             user_cloud_regions = aws_client.describe_regions()['Regions']
         except aws.botocore_exceptions().ClientError as e:
             if e.response['Error']['Code'] == 'UnauthorizedOperation':
@@ -94,6 +99,7 @@ def get_enabled_regions() -> Set[str]:
 
 def _get_instance_types(region: str) -> pd.DataFrame:
     client = aws.client('ec2', region_name=region)
+    print("instance type")
     paginator = client.get_paginator('describe_instance_types')
     items = []
     for i, resp in enumerate(paginator.paginate()):
@@ -105,6 +111,7 @@ def _get_instance_types(region: str) -> pd.DataFrame:
 
 def _get_instance_type_offerings(region: str) -> pd.DataFrame:
     client = aws.client('ec2', region_name=region)
+    print("instance offer")
     paginator = client.get_paginator('describe_instance_type_offerings')
     items = []
     for i, resp in enumerate(
@@ -117,6 +124,7 @@ def _get_instance_type_offerings(region: str) -> pd.DataFrame:
 
 
 def _get_availability_zones(region: str) -> Optional[pd.DataFrame]:
+    print("region",region)
     client = aws.client('ec2', region_name=region)
     zones = []
     try:
@@ -150,7 +158,12 @@ def _get_availability_zones(region: str) -> Optional[pd.DataFrame]:
 
 def _get_pricing_table(region: str) -> pd.DataFrame:
     print(f'{region} downloading pricing table')
-    url = PRICING_TABLE_URL_FMT.format(region=region)
+    url = ""
+    if region in ['cn-northwest-1','cn-north-1']:
+        url = PRICING_TABLE_URL_CN_FMT.format(region=region)
+    else:
+        url = PRICING_TABLE_URL_FMT.format(region=region)
+    print("url", url)
     df = pd.read_csv(url, skiprows=5, low_memory=False)
     df.rename(columns={
         'Instance Type': 'InstanceType',
@@ -228,6 +241,7 @@ def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
     try:
         # Fetch the zone info first to make sure the account has access to the
         # region.
+        print("get zones")
         zone_df = _get_availability_zones(region)
         if zone_df is None:
             raise RuntimeError(f'No access to region {region}')
@@ -305,6 +319,7 @@ def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
         df = pd.concat(
             [df, df.apply(get_additional_columns, axis='columns')],
             axis='columns')
+        print("Path p4de")
         # patch the df for p4de.24xlarge
         if region in P4DE_REGIONS:
             df = _patch_p4de(region, df, pricing_df)
@@ -413,6 +428,7 @@ def fetch_availability_zone_mappings() -> pd.DataFrame:
     regions = list(get_enabled_regions())
     # Use ThreadPool instead of Pool because this function can be called within
     # a Pool, and Pool cannot be nested.
+    print("regions", regions)
     with mp_pool.ThreadPool() as pool:
         az_mappings = pool.map(_get_availability_zones, regions)
     missing_regions = {
