@@ -63,7 +63,8 @@ USEFUL_COLUMNS = [
 # only available in this region, but it serves pricing information for all
 # regions.
 PRICING_TABLE_URL_FMT = 'https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/{region}/index.csv'  # pylint: disable=line-too-long
-PRICING_TABLE_URL_CN_FMT = 'https://pricing.cn-north-1.amazonaws.com.cn/offers/v1.0/cn/AmazonEC2/20230418173015/{region}/index.csv'
+# This is an edge case for the regions of CN AWS.
+PRICING_TABLE_URL_CN_FMT = 'https://pricing.cn-north-1.amazonaws.com.cn/offers/v1.0/cn/AmazonEC2/20230418173015/{region}/index.csv' # pylint: disable=line-too-long
 # Hardcode the regions that offer p4de.24xlarge as our credential does not have
 # the permission to query the offerings of the instance.
 # Ref: https://aws.amazon.com/ec2/instance-types/p4/
@@ -239,8 +240,8 @@ def _patch_p4de(region: str, df: pd.DataFrame,
 
 def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
     try:
-        # Fetch the zone info first to make sure the account has access to the
-        # region.
+        # Fetch the zone info first to make sure the account has access to
+        # the region.
         print("get zones")
         zone_df = _get_availability_zones(region)
         if zone_df is None:

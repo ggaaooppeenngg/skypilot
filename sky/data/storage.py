@@ -697,6 +697,7 @@ class Storage(object):
             store = store_cls(
                 name=self.name,
                 source=self.source,
+                region="cn-northwest-1",
                 sync_on_reconstruction=self.sync_on_reconstruction)
         except exceptions.StorageBucketCreateError:
             # Creation failed, so this must be sky managed store. Add failure
@@ -982,6 +983,7 @@ class S3Store(AbstractStore):
           StorageBucketGetError: If fetching existing bucket fails
           StorageInitError: If general initialization fails.
         """
+        print("init region", self.region)
         self.client = data_utils.create_s3_client(self.region)
         self.bucket, is_new_bucket = self._get_bucket()
         if self.is_sky_managed is None:
@@ -1107,7 +1109,8 @@ class S3Store(AbstractStore):
             StorageBucketCreateError: If creating the bucket fails
             StorageBucketGetError: If fetching a bucket fails
         """
-        s3 = aws.resource('s3')
+        s3 = aws.resource('s3',region_name = self.region);
+        print("s3 ; bucket",self.region);
         bucket = s3.Bucket(self.name)
 
         try:
@@ -1139,7 +1142,7 @@ class S3Store(AbstractStore):
         # the bucket is to be created by Sky. However, creation is skipped if
         # Store object is being reconstructed for deletion.
         if self.sync_on_reconstruction:
-            bucket = self._create_s3_bucket(self.name)
+            bucket = self._create_s3_bucket(self.name, self.region);
             return bucket, True
         else:
             return None, False
@@ -1175,7 +1178,7 @@ class S3Store(AbstractStore):
 
     def _create_s3_bucket(self,
                           bucket_name: str,
-                          region='us-east-2') -> StorageHandle:
+                          region: Optional[str] = None) -> StorageHandle:
         """Creates S3 bucket with specific name in specific region
 
         Args:
@@ -1187,7 +1190,7 @@ class S3Store(AbstractStore):
         s3_client = self.client
         try:
             if region is None:
-                s3_client.create_bucket(Bucket=bucket_name)
+                s3_client.create_bucket(Bucket=bucket_name);
             else:
                 location = {'LocationConstraint': region}
                 s3_client.create_bucket(Bucket=bucket_name,
@@ -1217,6 +1220,8 @@ class S3Store(AbstractStore):
         # The fastest way to delete is to run `aws s3 rb --force`,
         # which removes the bucket by force.
         remove_command = f'aws s3 rb s3://{bucket_name} --force'
+        if self.region is not None:
+            remove_command += f' --region {self.region}'
         try:
             with log_utils.safe_rich_status(
                     f'[bold cyan]Deleting S3 bucket {bucket_name}[/]'):

@@ -146,7 +146,6 @@ def _get_df() -> pd.DataFrame:
         with _apply_az_mapping_lock:
             if _user_df is None:
                 _user_df = _fetch_and_apply_az_mapping(_default_df)
-        print("user df" , _user_df)
         return _user_df
 
 
@@ -197,7 +196,6 @@ def get_default_instance_type(cpus: Optional[str] = None,
         f'{family}.' for family in _DEFAULT_INSTANCE_FAMILY)
     df = _get_df()
     df = df[df['InstanceType'].str.startswith(instance_type_prefix)]
-    print("get default",df)
     return common.get_instance_type_for_cpus_mem_impl(df, cpus,
                                                       memory_gb_or_ratio)
 
