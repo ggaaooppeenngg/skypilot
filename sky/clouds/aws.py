@@ -37,6 +37,7 @@ if typing.TYPE_CHECKING:
 # file nor the ability to understand AWS IAM.
 _CREDENTIAL_FILES = [
     'credentials',
+    'config'
 ]
 
 DEFAULT_AMI_GB = 45
