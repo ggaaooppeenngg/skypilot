@@ -1176,7 +1176,7 @@ class S3Store(AbstractStore):
 
     def _create_s3_bucket(self,
                           bucket_name: str,
-                          region: region='us-east-2') -> StorageHandle:
+                          region='us-east-2') -> StorageHandle:
         """Creates S3 bucket with specific name in specific region
 
         Args:
@@ -1188,7 +1188,7 @@ class S3Store(AbstractStore):
         s3_client = self.client
         try:
             if region is None:
-                s3_client.create_bucket(Bucket=bucket_name);
+                s3_client.create_bucket(Bucket=bucket_name)
             else:
                 location = {'LocationConstraint': region}
                 s3_client.create_bucket(Bucket=bucket_name,
