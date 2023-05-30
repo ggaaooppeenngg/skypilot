@@ -79,7 +79,6 @@ def get_enabled_regions() -> Set[str]:
     if regions_enabled is None:
         aws_client = aws.client('ec2')
         try:
-            res = aws_client.describe_regions()
             user_cloud_regions = aws_client.describe_regions()['Regions']
         except aws.botocore_exceptions().ClientError as e:
             if e.response['Error']['Code'] == 'UnauthorizedOperation':
