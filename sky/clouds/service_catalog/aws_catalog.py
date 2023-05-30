@@ -110,7 +110,6 @@ def _fetch_and_apply_az_mapping(df: pd.DataFrame) -> pd.DataFrame:
         logger.debug(
             'Failed to get AWS user identity. Using the latest mapping '
             f'file for user {aws_user_hash!r}.')
-    print("aws_user_hash", aws_user_hash)
     az_mapping_path = common.get_catalog_path(
         f'aws/az_mappings-{aws_user_hash}.csv')
     if not os.path.exists(az_mapping_path):
@@ -139,7 +138,6 @@ def _fetch_and_apply_az_mapping(df: pd.DataFrame) -> pd.DataFrame:
 
 def _get_df() -> pd.DataFrame:
     if config.get_use_default_catalog():
-        print("default catalog" , _default_df)
         return _default_df
     else:
         global _user_df

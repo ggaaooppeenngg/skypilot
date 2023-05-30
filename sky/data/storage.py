@@ -983,7 +983,6 @@ class S3Store(AbstractStore):
           StorageBucketGetError: If fetching existing bucket fails
           StorageInitError: If general initialization fails.
         """
-        print("init region", self.region)
         self.client = data_utils.create_s3_client(self.region)
         self.bucket, is_new_bucket = self._get_bucket()
         if self.is_sky_managed is None:
@@ -1110,7 +1109,6 @@ class S3Store(AbstractStore):
             StorageBucketGetError: If fetching a bucket fails
         """
         s3 = aws.resource('s3',region_name = self.region);
-        print("s3 ; bucket",self.region);
         bucket = s3.Bucket(self.name)
 
         try:

@@ -100,7 +100,6 @@ def get_enabled_regions() -> Set[str]:
 
 def _get_instance_types(region: str) -> pd.DataFrame:
     client = aws.client('ec2', region_name=region)
-    print("instance type")
     paginator = client.get_paginator('describe_instance_types')
     items = []
     for i, resp in enumerate(paginator.paginate()):
@@ -164,7 +163,6 @@ def _get_pricing_table(region: str) -> pd.DataFrame:
         url = PRICING_TABLE_URL_CN_FMT.format(region=region)
     else:
         url = PRICING_TABLE_URL_FMT.format(region=region)
-    print("url", url)
     df = pd.read_csv(url, skiprows=5, low_memory=False)
     df.rename(columns={
         'Instance Type': 'InstanceType',
