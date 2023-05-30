@@ -37,7 +37,6 @@ if typing.TYPE_CHECKING:
 # file nor the ability to understand AWS IAM.
 _CREDENTIAL_FILES = [
     'credentials',
-    'config',
 ]
 
 DEFAULT_AMI_GB = 45
@@ -360,6 +359,7 @@ class AWS(clouds.Cloud):
             # Treat Resources(AWS, p3.2x, V100) as Resources(AWS, p3.2x).
             resources = resources.copy(accelerators=None)
             return ([resources], [])
+
         def _make(instance_list):
             resource_list = []
             for instance_type in instance_list:

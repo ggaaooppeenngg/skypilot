@@ -110,6 +110,7 @@ def _fetch_and_apply_az_mapping(df: pd.DataFrame) -> pd.DataFrame:
         logger.debug(
             'Failed to get AWS user identity. Using the latest mapping '
             f'file for user {aws_user_hash!r}.')
+
     az_mapping_path = common.get_catalog_path(
         f'aws/az_mappings-{aws_user_hash}.csv')
     if not os.path.exists(az_mapping_path):
@@ -217,7 +218,6 @@ def get_instance_type_for_accelerator(
     Returns a list of instance types satisfying the required count of
     accelerators with sorted prices and a list of candidates with fuzzy search.
     """
-    print("get instance acc")
     return common.get_instance_type_for_accelerator_impl(df=_get_df(),
                                                          acc_name=acc_name,
                                                          acc_count=acc_count,
