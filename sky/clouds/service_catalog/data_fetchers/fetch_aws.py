@@ -313,7 +313,6 @@ def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
         df = pd.concat(
             [df, df.apply(get_additional_columns, axis='columns')],
             axis='columns')
-        print("Path p4de")
         # patch the df for p4de.24xlarge
         if region in P4DE_REGIONS:
             df = _patch_p4de(region, df, pricing_df)
@@ -422,7 +421,6 @@ def fetch_availability_zone_mappings() -> pd.DataFrame:
     regions = list(get_enabled_regions())
     # Use ThreadPool instead of Pool because this function can be called within
     # a Pool, and Pool cannot be nested.
-    print("regions", regions)
     with mp_pool.ThreadPool() as pool:
         az_mappings = pool.map(_get_availability_zones, regions)
     missing_regions = {

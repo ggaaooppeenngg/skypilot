@@ -1108,7 +1108,7 @@ class S3Store(AbstractStore):
             StorageBucketCreateError: If creating the bucket fails
             StorageBucketGetError: If fetching a bucket fails
         """
-        s3 = aws.resource('s3',region_name = self.region);
+        s3 = aws.resource('s3',region_name = self.region)
         bucket = s3.Bucket(self.name)
 
         try:
@@ -1140,7 +1140,7 @@ class S3Store(AbstractStore):
         # the bucket is to be created by Sky. However, creation is skipped if
         # Store object is being reconstructed for deletion.
         if self.sync_on_reconstruction:
-            bucket = self._create_s3_bucket(self.name, self.region);
+            bucket = self._create_s3_bucket(self.name, self.region)
             return bucket, True
         else:
             return None, False
@@ -1176,7 +1176,7 @@ class S3Store(AbstractStore):
 
     def _create_s3_bucket(self,
                           bucket_name: str,
-                          region: Optional[str] = None) -> StorageHandle:
+                          region: region='us-east-2') -> StorageHandle:
         """Creates S3 bucket with specific name in specific region
 
         Args:
