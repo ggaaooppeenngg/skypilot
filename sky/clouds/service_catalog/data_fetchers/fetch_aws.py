@@ -80,7 +80,6 @@ def get_enabled_regions() -> Set[str]:
         aws_client = aws.client('ec2')
         try:
             res = aws_client.describe_regions()
-            print(res)
             user_cloud_regions = aws_client.describe_regions()['Regions']
         except aws.botocore_exceptions().ClientError as e:
             if e.response['Error']['Code'] == 'UnauthorizedOperation':
@@ -111,7 +110,6 @@ def _get_instance_types(region: str) -> pd.DataFrame:
 
 def _get_instance_type_offerings(region: str) -> pd.DataFrame:
     client = aws.client('ec2', region_name=region)
-    print("instance offer")
     paginator = client.get_paginator('describe_instance_type_offerings')
     items = []
     for i, resp in enumerate(
@@ -124,7 +122,6 @@ def _get_instance_type_offerings(region: str) -> pd.DataFrame:
 
 
 def _get_availability_zones(region: str) -> Optional[pd.DataFrame]:
-    print("region",region)
     client = aws.client('ec2', region_name=region)
     zones = []
     try:
@@ -240,7 +237,6 @@ def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
     try:
         # Fetch the zone info first to make sure the account has access to
         # the region.
-        print("get zones")
         zone_df = _get_availability_zones(region)
         if zone_df is None:
             raise RuntimeError(f'No access to region {region}')
