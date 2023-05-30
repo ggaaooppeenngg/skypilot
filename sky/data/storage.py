@@ -1896,8 +1896,7 @@ class R2Store(AbstractStore):
         Args:
           mount_path: str; Path to mount the bucket to.
         """
-        install_cmd = ('sudo wget -nc https://github.com/romilbhardwaj/goofys/'
-                       'releases/download/0.24.0-romilb-upstream/goofys '
+        install_cmd = ('sudo wget -nc https://heywhale-public.oss-cn-shanghai.aliyuncs.com/skypilot/goofys'
                        '-O /usr/local/bin/goofys && '
                        'sudo chmod +x /usr/local/bin/goofys')
         endpoint_url = cloudflare.create_endpoint()
