@@ -234,8 +234,8 @@ def _patch_p4de(region: str, df: pd.DataFrame,
 
 def _get_instance_types_df(region: str) -> Union[str, pd.DataFrame]:
     try:
-        # Fetch the zone info first to make sure the account has access to
-        # the region.
+        # Fetch the zone info first to make sure the account has access to the
+        # region.
         zone_df = _get_availability_zones(region)
         if zone_df is None:
             raise RuntimeError(f'No access to region {region}')
